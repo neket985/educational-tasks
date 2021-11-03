@@ -2,7 +2,8 @@ package ru.smirnov.educational.ya2021
 
 object BTechCredit {
 
-    fun main() {
+    @JvmStatic
+    fun main(args: Array<String>) {
         val (N, X, K) = readLine()!!.split(" ").map { it.toInt() }
         val arr = readLine()!!.split(" ").map { it.toLong() }
         println(process(N, X, K, arr))
