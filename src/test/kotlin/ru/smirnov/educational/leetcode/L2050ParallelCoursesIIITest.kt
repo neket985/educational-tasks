@@ -14,19 +14,8 @@ internal class L2050ParallelCoursesIIITest {
 
     @Test
     fun minimumTime() {
-        val file = BufferedReader(InputStreamReader(javaClass.classLoader.getResourceAsStream("leetcode/L2050ParallelCoursesIII/test50000.txt")))
-        val minimumTime = L2050ParallelCoursesIII.minimumTime(
-            50000,
-            parseList(file.readLine(), "],[") {
-                parseList(it) { it.toInt() }.toIntArray()
-            }.toTypedArray(),
-            parseList(file.readLine()) { it.toInt() }.toIntArray()
-        )
-        println(minimumTime)
-
-
         assertTimeLimitAndMemoryUsageLimit(
-            Duration.ofSeconds(1), DataAmount.ofMega(256), listOf(
+            Duration.ofSeconds(2), DataAmount.ofMega(256), listOf(
                 {
                     assertEquals(
                         1,
@@ -81,7 +70,7 @@ internal class L2050ParallelCoursesIIITest {
                 {
                     val file = BufferedReader(InputStreamReader(javaClass.classLoader.getResourceAsStream("leetcode/L2050ParallelCoursesIII/test50000.txt")))
                     assertEquals(
-                        260070, //todo?
+                        199885162,
                         L2050ParallelCoursesIII.minimumTime(
                             50000,
                             parseList(file.readLine(), "],[") {
