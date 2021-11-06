@@ -38,8 +38,7 @@ internal class CMinesTest {
                         )
                     )
                 },
-                { assertEquals(1, CMines.process(100, 100, 0, listOf())) },
-//                { assertEquals(1, CMines.process(100, 100, 0, listOf())) }, todo
+                { assertEquals(1, CMines.process(100, 100, 0, listOf())) }
             )
         )
     }
