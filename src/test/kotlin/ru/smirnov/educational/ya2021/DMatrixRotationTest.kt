@@ -6,7 +6,7 @@ import ru.smirnov.educational.DataAmount
 import ru.smirnov.educational.Utils
 import java.time.Duration
 import kotlin.math.absoluteValue
-import kotlin.math.withSign
+import kotlin.math.pow
 
 internal class DMatrixRotationTest {
 
@@ -16,16 +16,33 @@ internal class DMatrixRotationTest {
             Duration.ofSeconds(2),
             DataAmount.ofMega(256),
             listOf(
-//                {
-//                    assert(
-//                        listOf(
-//                            listOf(-1.0, 0.0),
-//                            listOf(1.0, 0.0)
-//                        ).roundContains(
-//                            DMatrixRotation.process(2, listOf(listOf(0.0, 1.0)))
-//                        )
-//                    )
-//                },
+                {
+                    assert(
+                        listOf(
+                            listOf(-1.0, 0.0),
+                            listOf(1.0, 0.0)
+                        ).roundContains(
+                            DMatrixRotation.process(2, listOf(listOf(0.0, 1.0))), 6
+                        )
+                    )
+                },
+                {
+                    assert(
+                        listOf(
+                            listOf(0.0, -1.0, 0.0, 0.0),
+                            listOf(0.0, 1.0, 0.0, 0.0)
+                        ).roundContains(
+                            DMatrixRotation.process(
+                                4, listOf(
+                                    listOf(0.0, 0.0, 0.0, 1.0),
+                                    listOf(1.0, 0.0, 0.0, 0.0),
+                                    listOf(0.0, 0.0, 1.0, 0.0)
+                                )
+                            ),
+                            6
+                        )
+                    )
+                },
                 {
                     assert(
                         listOf(
@@ -38,7 +55,86 @@ internal class DMatrixRotationTest {
                                     listOf(0.6666666666666, 0.6666666666666, 0.3333333333333),
                                     listOf(-0.3333333333333, 0.6666666666666, -0.6666666666666)
                                 )
-                            )
+                            ),
+                            6
+                        )
+                    )
+                },
+                {
+                    assert(
+                        listOf(
+                            listOf(-0.22919, -0.41411, 0.01141, -0.30659, 0.82575),
+                            listOf(0.22919, 0.41411, -0.01141, 0.30659, -0.82575)
+                        ).roundContains(
+                            DMatrixRotation.process(
+                                5,
+                                listOf(
+                                    listOf(-0.24045, -0.17761, 0.01603, -0.83299, -0.46531),
+                                    listOf(-0.94274, 0.12031, 0.00566, 0.29741, -0.09098),
+                                    listOf(-0.02069, 0.30417, -0.93612, -0.13759, 0.10865),
+                                    listOf(0.02155, -0.83065, -0.35109, 0.32365, -0.28556),
+                                )
+                            ),
+                            4
+                        )
+                    )
+                },
+                {
+                    assert(
+                        listOf(
+                            listOf(0.07863783, 0.7048799, 0.08914089, -0.64230492, -0.27651168),
+                            listOf(-0.07863783, -0.7048799, -0.08914089, 0.64230492, 0.27651168),
+                        ).roundContains(
+                            DMatrixRotation.process(
+                                5,
+                                listOf(
+                                    listOf(-0.63470728, 0.41984536, 0.41569193, 0.25708079, 0.42659843),
+                                    listOf(-0.36418389, 0.06244462, -0.82734663, -0.24066123, 0.3479231),
+                                    listOf(0.67691426, 0.33798442, -0.05984083, 0.17555011, 0.62702062),
+                                    listOf(-0.01095148, -0.45688226, 0.36217501, -0.65773717, 0.47681205)
+                                )
+                            ),
+                            4
+                        )
+                    )
+                },
+                {
+                    val angle = 3.1415926 / 15
+                    assert(
+                        listOf(
+                            listOf(0.0, Math.sin(angle), 0.0, 0.0, Math.cos(angle)),
+                            listOf(0.0, -Math.sin(angle), 0.0, 0.0, -Math.cos(angle)),
+                        ).roundContains(
+                            DMatrixRotation.process(
+                                5,
+                                listOf(
+                                    listOf(1.0, 0.0, 0.0, 0.0, 0.0),
+                                    listOf(0.0, 0.0, 1.0, 0.0, 0.0),
+                                    listOf(0.0, 0.0, 0.0, 1.0, 0.0),
+                                    listOf(0.0, Math.cos(angle), 0.0, 0.0, -Math.sin(angle)),
+                                )
+                            ),
+                            4
+                        )
+                    )
+                },
+                {
+                    val angle = 3.1415926 / 12
+                    assert(
+                        listOf(
+                            listOf(0.0, 0.0, 0.0, 1.0, 0.0),
+                            listOf(0.0, 0.0, 0.0, -1.0, 0.0)
+                        ).roundContains(
+                            DMatrixRotation.process(
+                                5,
+                                listOf(
+                                    listOf(1.0, 0.0, 0.0, 0.0, 0.0),
+                                    listOf(0.0, Math.sin(angle), Math.cos(angle), 0.0, 0.0),
+                                    listOf(0.0, Math.cos(angle), -Math.sin(angle), 0.0, 0.0),
+                                    listOf(0.0, 0.0, 0.0, 0.0, 1.0),
+                                )
+                            ),
+                            4
                         )
                     )
                 },
@@ -48,32 +144,32 @@ internal class DMatrixRotationTest {
     }
 
     @Test
-    fun gaussianMatrixTest(){
+    fun gaussianMatrixTest() {
         val matrix = DMatrixRotation.Matrix(
             listOf(
-                DMatrixRotation.MatrixRow(listOf(0.0, 0.0, 1.0), 1.0),
-                DMatrixRotation.MatrixRow(listOf(1.0, 2.0, 3.0), 2.0),
-                DMatrixRotation.MatrixRow(listOf(4.0, 1.0, 0.0), 3.0),
+                DMatrixRotation.MatrixRow(listOf(0.0, 0.0, 1.0)),
+                DMatrixRotation.MatrixRow(listOf(1.0, 2.0, 3.0)),
+                DMatrixRotation.MatrixRow(listOf(4.0, 1.0, 0.0)),
             )
         )
 
         val result = matrix.toGaussianViewMatrix()
-        assertEquals(0.0, result.elements[1].first[0].absoluteValue)
-        assertEquals(0.0, result.elements[2].first[0].absoluteValue)
-        assertEquals(0.0, result.elements[2].first[1].absoluteValue)
+        assertEquals(0.0, result.elements[1].values[0].absoluteValue)
+        assertEquals(0.0, result.elements[2].values[0].absoluteValue)
+        assertEquals(0.0, result.elements[2].values[1].absoluteValue)
     }
 
-    //один из списков ответов содержит ответ, совподающий с полученным с точностью до 6 знаков
-    private fun List<List<Double>>.roundContains(item: List<Double>) =
+    //один из списков ответов содержит ответ, совподающий с полученным с точностью до {{sign}} знаков
+    private fun List<List<Double>>.roundContains(item: List<Double>, sign: Int) =
         any { list ->
             if (list.size != item.size) return@any false
             list.forEachIndexed { index, d ->
-                if (!roundEquals(d, item[index])) return@any false
+                if (!roundEquals(d, item[index], sign)) return@any false
             }
             return@any true
         }
 
-    private fun roundEquals(first: Double, second: Double) =
-        (first * 1000000).toInt() == (second * 1000000).toInt()
+    private fun roundEquals(first: Double, second: Double, sign: Int) =
+        (first * 10.0.pow(sign)).toInt() == (second * 10.0.pow(sign)).toInt()
 
 }
