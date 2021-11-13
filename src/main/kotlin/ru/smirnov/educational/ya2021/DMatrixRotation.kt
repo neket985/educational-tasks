@@ -1,106 +1,98 @@
 package ru.smirnov.educational.ya2021
 
-import kotlin.math.pow
-
 object DMatrixRotation {
 
     fun process(N: Int, matrix: List<List<Double>>): List<Double> {
-//        val isOneBasedMatrix = matrix[0].any { it==1.0 } //todo корректно работать с матрицами, в которых есть 0 (не все они единичные)
-        val isOneBasedMatrix = false
-        if(isOneBasedMatrix){
-            var lastRowIndexOne = -1
-            for(i in (0 until N)){
-                if(!matrix.any { it[i]==1.0 }){
-                    lastRowIndexOne = i
-                    break
-                }
+        return recursiveGettingDeterminantVector(N, matrix.map {
+            it.mapIndexed { index, d ->
+                DeterminantContainer(index, d)
             }
-            return (0 until N).map{if(it==lastRowIndexOne) 1.0 else 0.0}
-        }else {
-            val m = Matrix(matrix.map { list -> MatrixRow(list) }).toGaussianViewMatrix()
-
-            val xByLastX = DoubleArray(N) { 1.0 }
-            (0..N - 2).reversed().forEach { i ->
-                val row = m[i]
-                var lastXSum = 0.0
-                (i + 1..N - 1).forEach {
-                    lastXSum += row[it] * xByLastX[it]
-                }
-                xByLastX[i] = -lastXSum / row[i]
-            }
-
-            val lastX2SumForLastMRow = xByLastX.reduceIndexed { index, acc, d ->
-                if (index == 1) acc * acc + d * d
-                else acc + d * d
-            }
-
-            val lastX = (1 / lastX2SumForLastMRow).pow(1.0 / 2) //todo +- | два варианта
-
-            return xByLastX.map {
-                it * lastX
-            }
-        }
+        }).sortedBy { it.xIndex }.map { it.value }
     }
 
-    data class MatrixRow(
-        val values: List<Double>
-    ) {
-        operator fun get(index: Int) = values[index]
-
-        operator fun plus(other: MatrixRow) =
-            MatrixRow(
-                values.mapIndexed { index, d ->
-                    d + other.values[index]
-                }
+    //сложность n^2
+    private fun recursiveGettingDeterminantVector(
+        n: Int,
+        matrix: List<List<DeterminantContainer>>
+    ): List<DeterminantContainer> = run {
+        if (n == 2) {
+            listOf(
+                DeterminantContainer(matrix[0][0].xIndex, -matrix[0][1].value),
+                DeterminantContainer(matrix[0][1].xIndex, matrix[0][0].value)
             )
+        } else {
+            val matrixGaussian = matrixGaussian(n, matrix)
+//            val matrixGaussian = matrix
+            val baseRowIndex = n - 2
+            val emptyVector = (0 until n).map { i -> DeterminantContainer(i, 0.0) }
+            (0 until n).flatMap { i ->
+                val sign = if ((baseRowIndex + i) % 2 == 0) +1 else -1
+                val base = matrixGaussian[baseRowIndex][i].value * sign
+                if (base == 0.0) return@flatMap emptyVector
 
-        operator fun times(multiplier: Double) =
-            MatrixRow(
-                values.map { d ->
-                    d * multiplier
-                }
-            )
-    }
+                val subMatrixIndexes = (0 until n).toMutableList().apply { remove(i) }
 
-    data class Matrix(
-        val elements: List<MatrixRow>,
-    ) {
-        private val size = elements.size
-
-        operator fun get(index: Int) = elements[index]
-
-        fun toGaussianViewMatrix(): Matrix {
-            val sortedPreFilledElements = elements.toMutableList()
-
-            (0 until size).forEach { index ->
-                val it = sortedPreFilledElements[index].let {
-                    if (it[index] == 0.0) {
-                        var plus: MatrixRow? = null
-                        pl@ for (it in index + 1 until size) {
-                            val e = sortedPreFilledElements[it]
-                            if (e[index] != 0.0) {
-                                plus = e
-                                break@pl
-                            }
-                        }
-                        if (plus == null) throw IllegalStateException("it's one based matrix")
-                        (it + plus).apply {
-                            sortedPreFilledElements[index] = this
-                        }
-                    } else it
-                }
-                (index + 1 until size).forEach { indexOther ->
-                    val other = sortedPreFilledElements[indexOther]
-                    val i1 = it[index]
-                    val i2 = other[index]
-                    if (i2 != 0.0) {
-                        val negativeOther = it * (i2 * -1)
-                        sortedPreFilledElements[indexOther] = (other * i1 + negativeOther) * (1 / i1)
+                val newMatrix = (0 until n - 2).map { subMatrixRowIndex ->
+                    subMatrixIndexes.map { subMatrixIndex ->
+                        matrixGaussian[subMatrixRowIndex][subMatrixIndex]
                     }
                 }
+
+                recursiveGettingDeterminantVector(n - 1, newMatrix).map {
+                    it.copy(value = it.value * base)
+                }
+            }.groupBy { it.xIndex }.map { (xIndex, values) ->
+                DeterminantContainer(xIndex, values.sumByDouble { it.value })
             }
-            return Matrix(sortedPreFilledElements)
+        }
+    }
+
+    fun matrixGaussian(
+        n: Int,
+        matrix: List<List<DeterminantContainer>>
+    ): List<List<DeterminantContainer>> {
+        val newMatrix = matrix.toMutableList()
+        (0 until n - 2).forEach { index ->
+            val it = newMatrix[index].let {
+                if (it[index].value == 0.0) {
+                    var plus: List<DeterminantContainer>? = null
+                    pl@ for (it in index + 1 until n - 1) {
+                        val e = newMatrix[it]
+                        if (e[index].value != 0.0) {
+                            plus = e
+                            break@pl
+                        }
+                    }
+                    plus?.run { (it + this).apply { newMatrix[index] = this } } ?: it
+                } else it
+            }
+            (index + 1 until n - 1).forEach { indexOther ->
+                val other = newMatrix[indexOther]
+                val i1 = it[index].value
+                val i2 = other[index].value
+                if (i2 != 0.0) {
+                    val negativeOther = it * (i2 * -1)
+                    newMatrix[indexOther] = (other * i1 + negativeOther) * (1 / (i1))
+                }
+            }
         }
 
+        return newMatrix
     }
+
+    operator fun List<DeterminantContainer>.plus(other: List<DeterminantContainer>) =
+        this.plus(other.toTypedArray()).groupBy { it.xIndex }
+            .map {
+                DeterminantContainer(it.key, it.value.sumByDouble { it.value })
+            }
+
+    operator fun List<DeterminantContainer>.times(multiplier: Double) =
+        this.map { d ->
+            d.copy(value = d.value * multiplier)
+        }
 }
+
+data class DeterminantContainer(
+    val xIndex: Int,
+    val value: Double
+)

@@ -4,7 +4,9 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import ru.smirnov.educational.DataAmount
 import ru.smirnov.educational.Utils
+import ru.smirnov.educational.ya2021.DMatrixRotation.matrixGaussian
 import java.time.Duration
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.math.absoluteValue
 import kotlin.math.pow
 
@@ -12,8 +14,9 @@ internal class DMatrixRotationTest {
 
     @Test
     fun process() {
+
         Utils.assertTimeLimitAndMemoryUsageLimit(
-            Duration.ofSeconds(2),
+            Duration.ofSeconds(30),
             DataAmount.ofMega(256),
             listOf(
                 {
@@ -138,6 +141,37 @@ internal class DMatrixRotationTest {
                         )
                     )
                 },
+                {
+                    val angle = 3.1415926 / 12
+                    assert(
+                        listOf(
+                            listOf(0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+                            listOf(0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+                        ).roundContains(
+                            DMatrixRotation.process(
+                                16,
+                                listOf(
+                                    listOf(1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+                                    listOf(0.0, Math.sin(angle), Math.cos(angle), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+                                    listOf(0.0, Math.cos(angle), -Math.sin(angle), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+                                    listOf(0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+                                    listOf(0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+                                    listOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+                                    listOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+                                    listOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+                                    listOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+                                    listOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+                                    listOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0),
+                                    listOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0),
+                                    listOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0),
+                                    listOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0),
+                                    listOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0)
+                                )
+                            ),
+                            4
+                        )
+                    )
+                },
                 //todo 16x matrix
             )
         )
@@ -145,18 +179,17 @@ internal class DMatrixRotationTest {
 
     @Test
     fun gaussianMatrixTest() {
-        val matrix = DMatrixRotation.Matrix(
+        val matrix =
             listOf(
-                DMatrixRotation.MatrixRow(listOf(0.0, 0.0, 1.0)),
-                DMatrixRotation.MatrixRow(listOf(1.0, 2.0, 3.0)),
-                DMatrixRotation.MatrixRow(listOf(4.0, 1.0, 0.0)),
+                listOf(0.0, 0.0, 1.0, 1.0).mapIndexed{ i, it -> DeterminantContainer(i, it)},
+                listOf(1.0, 2.0, 3.0, 2.0).mapIndexed{ i, it -> DeterminantContainer(i, it)},
+                listOf(4.0, 1.0, 0.0, 3.0).mapIndexed{ i, it -> DeterminantContainer(i, it)}
             )
-        )
 
-        val result = matrix.toGaussianViewMatrix()
-        assertEquals(0.0, result.elements[1].values[0].absoluteValue)
-        assertEquals(0.0, result.elements[2].values[0].absoluteValue)
-        assertEquals(0.0, result.elements[2].values[1].absoluteValue)
+        val result = matrixGaussian(4, matrix)
+        assertEquals(0.0, result[1][0].value.absoluteValue)
+        assertEquals(0.0, result[2][0].value.absoluteValue)
+        assertEquals(0.0, result[2][1].value.absoluteValue)
     }
 
     //один из списков ответов содержит ответ, совподающий с полученным с точностью до {{sign}} знаков
@@ -170,6 +203,6 @@ internal class DMatrixRotationTest {
         }
 
     private fun roundEquals(first: Double, second: Double, sign: Int) =
-        (first * 10.0.pow(sign)).toInt() == (second * 10.0.pow(sign)).toInt()
+        ((first - second)* 10.0.pow(sign)).toInt() == 0
 
 }
