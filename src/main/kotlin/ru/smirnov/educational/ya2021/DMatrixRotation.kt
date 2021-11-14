@@ -52,11 +52,12 @@ object DMatrixRotation {
         matrix: List<List<DeterminantContainer>>
     ): List<List<DeterminantContainer>> {
         val newMatrix = matrix.toMutableList()
-        (0 until n - 2).forEach { index ->
+        val size = matrix.size
+        (0 until size - 1).forEach { index ->
             val it = newMatrix[index].let {
                 if (it[index].value == 0.0) {
                     var plus: List<DeterminantContainer>? = null
-                    pl@ for (it in index + 1 until n - 1) {
+                    pl@ for (it in index + 1 until size) {
                         val e = newMatrix[it]
                         if (e[index].value != 0.0) {
                             plus = e
@@ -66,7 +67,7 @@ object DMatrixRotation {
                     plus?.run { (it + this).apply { newMatrix[index] = this } } ?: it
                 } else it
             }
-            (index + 1 until n - 1).forEach { indexOther ->
+            (index + 1 until size).forEach { indexOther ->
                 val other = newMatrix[indexOther]
                 val i1 = it[index].value
                 val i2 = other[index].value
