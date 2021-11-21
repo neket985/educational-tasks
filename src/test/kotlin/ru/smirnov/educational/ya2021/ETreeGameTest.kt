@@ -7,7 +7,7 @@ import ru.smirnov.educational.Utils
 import java.time.Duration
 
 internal class ETreeGameTest {
-
+    //todo write more tests
     @Test
     fun process() {
         Utils.assertTimeLimitAndMemoryUsageLimit(
