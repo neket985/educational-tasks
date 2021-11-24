@@ -4,10 +4,8 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import ru.smirnov.educational.DataAmount
 import ru.smirnov.educational.Utils.assertTimeLimitAndMemoryUsageLimit
+import ru.smirnov.educational.Utils.filReaderFromClasspath
 import ru.smirnov.educational.Utils.parseList
-import java.io.BufferedReader
-import java.io.FileReader
-import java.io.InputStreamReader
 import java.time.Duration
 
 internal class L2050ParallelCoursesIIITest {
@@ -68,7 +66,7 @@ internal class L2050ParallelCoursesIIITest {
                     )
                 },
                 {
-                    val file = BufferedReader(InputStreamReader(javaClass.classLoader.getResourceAsStream("leetcode/L2050ParallelCoursesIII/test50000.txt")))
+                    val file = filReaderFromClasspath("leetcode/L2050ParallelCoursesIII/test50000.txt")
                     assertEquals(
                         199885162,
                         L2050ParallelCoursesIII.minimumTime(

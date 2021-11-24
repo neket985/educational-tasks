@@ -3,6 +3,8 @@ package ru.smirnov.educational
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.function.ThrowingSupplier
 import org.junit.platform.commons.logging.LoggerFactory
+import java.io.BufferedReader
+import java.io.InputStreamReader
 import java.time.Duration
 
 object Utils {
@@ -44,4 +46,6 @@ object Utils {
     fun <T> parseList(ps: String, delimiter: String = ",", parse: (String) -> T) = ps.split(delimiter).map {
         parse(it)
     }
+
+    fun filReaderFromClasspath(path: String) = BufferedReader(InputStreamReader(javaClass.classLoader.getResourceAsStream(path)))
 }

@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import ru.smirnov.educational.DataAmount
 import ru.smirnov.educational.Utils
+import ru.smirnov.educational.Utils.filReaderFromClasspath
+import ru.smirnov.educational.Utils.parseList
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.time.Duration
@@ -108,7 +110,7 @@ internal class ETreeGameTest {
                     )
                 },
                 {
-                    val file = BufferedReader(InputStreamReader(javaClass.classLoader.getResourceAsStream("ya2021/ETreeGame/6334_entry.txt")))
+                    val file = filReaderFromClasspath("ya2021/ETreeGame/6334_entry.txt")
                     val points = file.readLine()
                     val relations = file.readLine()
                         assertEquals(
@@ -116,7 +118,7 @@ internal class ETreeGameTest {
                         ETreeGame.process(
                             6334, 5,
                             points,
-                            Utils.parseList(relations, "), (") {
+                            parseList(relations, "), (") {
                                 it.split(", ").run{get(0).toInt() to get(1).toInt()}
                             }
                         )
