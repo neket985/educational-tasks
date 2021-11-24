@@ -16,7 +16,7 @@ internal class DMatrixRotationTest {
     fun process() {
 
         Utils.assertTimeLimitAndMemoryUsageLimit(
-            Duration.ofSeconds(30),
+            Duration.ofSeconds(2),
             DataAmount.ofMega(256),
             listOf(
                 {
