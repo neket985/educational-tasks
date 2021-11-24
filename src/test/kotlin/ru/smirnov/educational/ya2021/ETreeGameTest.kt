@@ -6,15 +6,13 @@ import ru.smirnov.educational.DataAmount
 import ru.smirnov.educational.Utils
 import ru.smirnov.educational.Utils.filReaderFromClasspath
 import ru.smirnov.educational.Utils.parseList
-import java.io.BufferedReader
-import java.io.InputStreamReader
 import java.time.Duration
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.random.Random
 
 internal class ETreeGameTest {
 
-    @Test
+    //    @Test
     fun genTree() {
         val q = generateTree(3000, 4, 0.2)
         println(q.first)
@@ -22,109 +20,106 @@ internal class ETreeGameTest {
         println("" + q.first.length + " - " + q.second.size)
     }
 
-    //todo write more tests
     @Test
     fun process() {
         Utils.assertTimeLimitAndMemoryUsageLimit(
             Duration.ofSeconds(2),
             DataAmount.ofMega(256),
-            listOf(
-                {
-                    assertEquals(
-                        ETreeGame.Winner.First,
-                        ETreeGame.process(
-                            2, 0, ".+",
-                            listOf(
-                                1 to 2
-                            )
+            {
+                assertEquals(
+                    ETreeGame.Winner.First,
+                    ETreeGame.process(
+                        2, 0, ".+",
+                        listOf(
+                            1 to 2
                         )
                     )
-                },
-                {
-                    assertEquals(
-                        ETreeGame.Winner.First,
-                        ETreeGame.process(
-                            2, 0, ".-",
-                            listOf(
-                                1 to 2
-                            )
+                )
+            },
+            {
+                assertEquals(
+                    ETreeGame.Winner.First,
+                    ETreeGame.process(
+                        2, 0, ".-",
+                        listOf(
+                            1 to 2
                         )
                     )
-                },
-                {
-                    assertEquals(
-                        ETreeGame.Winner.Draw,
-                        ETreeGame.process(
-                            2, 0, ".0",
-                            listOf(
-                                1 to 2
-                            )
+                )
+            },
+            {
+                assertEquals(
+                    ETreeGame.Winner.Draw,
+                    ETreeGame.process(
+                        2, 0, ".0",
+                        listOf(
+                            1 to 2
                         )
                     )
-                },
-                {
-                    assertEquals(
-                        ETreeGame.Winner.Second,
-                        ETreeGame.process(
-                            2, 0, "..+-",
-                            listOf(
-                                1 to 2,
-                                2 to 3,
-                                2 to 4
-                            )
+                )
+            },
+            {
+                assertEquals(
+                    ETreeGame.Winner.Second,
+                    ETreeGame.process(
+                        2, 0, "..+-",
+                        listOf(
+                            1 to 2,
+                            2 to 3,
+                            2 to 4
                         )
                     )
-                },
-                {
-                    assertEquals(
-                        ETreeGame.Winner.First,
-                        ETreeGame.process(
-                            8, 1, "..-0..-+",
-                            listOf(
-                                1 to 2,
-                                2 to 3,
-                                2 to 4,
-                                1 to 5,
-                                5 to 6,
-                                6 to 7,
-                                6 to 8
-                            )
+                )
+            },
+            {
+                assertEquals(
+                    ETreeGame.Winner.First,
+                    ETreeGame.process(
+                        8, 1, "..-0..-+",
+                        listOf(
+                            1 to 2,
+                            2 to 3,
+                            2 to 4,
+                            1 to 5,
+                            5 to 6,
+                            6 to 7,
+                            6 to 8
                         )
                     )
-                },
-                {
-                    assertEquals(
-                        ETreeGame.Winner.Draw,
-                        ETreeGame.process(
-                            8, 1, "..-0..0+",
-                            listOf(
-                                1 to 2,
-                                2 to 3,
-                                2 to 4,
-                                1 to 5,
-                                5 to 6,
-                                6 to 7,
-                                6 to 8
-                            )
+                )
+            },
+            {
+                assertEquals(
+                    ETreeGame.Winner.Draw,
+                    ETreeGame.process(
+                        8, 1, "..-0..0+",
+                        listOf(
+                            1 to 2,
+                            2 to 3,
+                            2 to 4,
+                            1 to 5,
+                            5 to 6,
+                            6 to 7,
+                            6 to 8
                         )
                     )
-                },
-                {
-                    val file = filReaderFromClasspath("ya2021/ETreeGame/6334_entry.txt")
-                    val points = file.readLine()
-                    val relations = file.readLine()
-                        assertEquals(
-                        ETreeGame.Winner.Draw,
-                        ETreeGame.process(
-                            6334, 5,
-                            points,
-                            parseList(relations, "), (") {
-                                it.split(", ").run{get(0).toInt() to get(1).toInt()}
-                            }
-                        )
+                )
+            },
+            {
+                val file = filReaderFromClasspath("ya2021/ETreeGame/6334_entry.txt")
+                val points = file.readLine()
+                val relations = file.readLine()
+                assertEquals(
+                    ETreeGame.Winner.Draw,
+                    ETreeGame.process(
+                        6334, 5,
+                        points,
+                        parseList(relations, "), (") {
+                            it.split(", ").run { get(0).toInt() to get(1).toInt() }
+                        }
                     )
-                },
-            )
+                )
+            },
         )
     }
 

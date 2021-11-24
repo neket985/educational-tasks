@@ -18,138 +18,137 @@ internal class DMatrixRotationTest {
         Utils.assertTimeLimitAndMemoryUsageLimit(
             Duration.ofSeconds(2),
             DataAmount.ofMega(256),
-            listOf(
-                {
-                    assert(
-                        listOf(
-                            listOf(-1.0, 0.0),
-                            listOf(1.0, 0.0)
-                        ).roundContains(
-                            DMatrixRotation.process(2, listOf(listOf(0.0, 1.0))), 6
-                        )
+            {
+                assert(
+                    listOf(
+                        listOf(-1.0, 0.0),
+                        listOf(1.0, 0.0)
+                    ).roundContains(
+                        DMatrixRotation.process(2, listOf(listOf(0.0, 1.0))), 6
                     )
-                },
-                {
-                    assert(
-                        listOf(
-                            listOf(0.0, -1.0, 0.0, 0.0),
-                            listOf(0.0, 1.0, 0.0, 0.0)
-                        ).roundContains(
-                            DMatrixRotation.process(
-                                4, listOf(
-                                    listOf(0.0, 0.0, 0.0, 1.0),
-                                    listOf(1.0, 0.0, 0.0, 0.0),
-                                    listOf(0.0, 0.0, 1.0, 0.0)
-                                )
-                            ),
-                            6
-                        )
+                )
+            },
+            {
+                assert(
+                    listOf(
+                        listOf(0.0, -1.0, 0.0, 0.0),
+                        listOf(0.0, 1.0, 0.0, 0.0)
+                    ).roundContains(
+                        DMatrixRotation.process(
+                            4, listOf(
+                                listOf(0.0, 0.0, 0.0, 1.0),
+                                listOf(1.0, 0.0, 0.0, 0.0),
+                                listOf(0.0, 0.0, 1.0, 0.0)
+                            )
+                        ),
+                        6
                     )
-                },
-                {
-                    assert(
-                        listOf(
-                            listOf(-0.666666666667, 0.333333333333, 0.666666666667),
-                            listOf(0.666666666667, -0.333333333333, -0.666666666667)
-                        ).roundContains(
-                            DMatrixRotation.process(
-                                3,
-                                listOf(
-                                    listOf(0.6666666666666, 0.6666666666666, 0.3333333333333),
-                                    listOf(-0.3333333333333, 0.6666666666666, -0.6666666666666)
-                                )
-                            ),
-                            6
-                        )
+                )
+            },
+            {
+                assert(
+                    listOf(
+                        listOf(-0.666666666667, 0.333333333333, 0.666666666667),
+                        listOf(0.666666666667, -0.333333333333, -0.666666666667)
+                    ).roundContains(
+                        DMatrixRotation.process(
+                            3,
+                            listOf(
+                                listOf(0.6666666666666, 0.6666666666666, 0.3333333333333),
+                                listOf(-0.3333333333333, 0.6666666666666, -0.6666666666666)
+                            )
+                        ),
+                        6
                     )
-                },
-                {
-                    assert(
-                        listOf(
-                            listOf(-0.22919, -0.41411, 0.01141, -0.30659, 0.82575),
-                            listOf(0.22919, 0.41411, -0.01141, 0.30659, -0.82575)
-                        ).roundContains(
-                            DMatrixRotation.process(
-                                5,
-                                listOf(
-                                    listOf(-0.24045, -0.17761, 0.01603, -0.83299, -0.46531),
-                                    listOf(-0.94274, 0.12031, 0.00566, 0.29741, -0.09098),
-                                    listOf(-0.02069, 0.30417, -0.93612, -0.13759, 0.10865),
-                                    listOf(0.02155, -0.83065, -0.35109, 0.32365, -0.28556),
-                                )
-                            ),
-                            4
-                        )
+                )
+            },
+            {
+                assert(
+                    listOf(
+                        listOf(-0.22919, -0.41411, 0.01141, -0.30659, 0.82575),
+                        listOf(0.22919, 0.41411, -0.01141, 0.30659, -0.82575)
+                    ).roundContains(
+                        DMatrixRotation.process(
+                            5,
+                            listOf(
+                                listOf(-0.24045, -0.17761, 0.01603, -0.83299, -0.46531),
+                                listOf(-0.94274, 0.12031, 0.00566, 0.29741, -0.09098),
+                                listOf(-0.02069, 0.30417, -0.93612, -0.13759, 0.10865),
+                                listOf(0.02155, -0.83065, -0.35109, 0.32365, -0.28556),
+                            )
+                        ),
+                        4
                     )
-                },
-                {
-                    assert(
-                        listOf(
-                            listOf(0.07863783, 0.7048799, 0.08914089, -0.64230492, -0.27651168),
-                            listOf(-0.07863783, -0.7048799, -0.08914089, 0.64230492, 0.27651168),
-                        ).roundContains(
-                            DMatrixRotation.process(
-                                5,
-                                listOf(
-                                    listOf(-0.63470728, 0.41984536, 0.41569193, 0.25708079, 0.42659843),
-                                    listOf(-0.36418389, 0.06244462, -0.82734663, -0.24066123, 0.3479231),
-                                    listOf(0.67691426, 0.33798442, -0.05984083, 0.17555011, 0.62702062),
-                                    listOf(-0.01095148, -0.45688226, 0.36217501, -0.65773717, 0.47681205)
-                                )
-                            ),
-                            4
-                        )
+                )
+            },
+            {
+                assert(
+                    listOf(
+                        listOf(0.07863783, 0.7048799, 0.08914089, -0.64230492, -0.27651168),
+                        listOf(-0.07863783, -0.7048799, -0.08914089, 0.64230492, 0.27651168),
+                    ).roundContains(
+                        DMatrixRotation.process(
+                            5,
+                            listOf(
+                                listOf(-0.63470728, 0.41984536, 0.41569193, 0.25708079, 0.42659843),
+                                listOf(-0.36418389, 0.06244462, -0.82734663, -0.24066123, 0.3479231),
+                                listOf(0.67691426, 0.33798442, -0.05984083, 0.17555011, 0.62702062),
+                                listOf(-0.01095148, -0.45688226, 0.36217501, -0.65773717, 0.47681205)
+                            )
+                        ),
+                        4
                     )
-                },
-                {
-                    val angle = 3.1415926 / 15
-                    assert(
-                        listOf(
-                            listOf(0.0, Math.sin(angle), 0.0, 0.0, Math.cos(angle)),
-                            listOf(0.0, -Math.sin(angle), 0.0, 0.0, -Math.cos(angle)),
-                        ).roundContains(
-                            DMatrixRotation.process(
-                                5,
-                                listOf(
-                                    listOf(1.0, 0.0, 0.0, 0.0, 0.0),
-                                    listOf(0.0, 0.0, 1.0, 0.0, 0.0),
-                                    listOf(0.0, 0.0, 0.0, 1.0, 0.0),
-                                    listOf(0.0, Math.cos(angle), 0.0, 0.0, -Math.sin(angle)),
-                                )
-                            ),
-                            4
-                        )
+                )
+            },
+            {
+                val angle = 3.1415926 / 15
+                assert(
+                    listOf(
+                        listOf(0.0, Math.sin(angle), 0.0, 0.0, Math.cos(angle)),
+                        listOf(0.0, -Math.sin(angle), 0.0, 0.0, -Math.cos(angle)),
+                    ).roundContains(
+                        DMatrixRotation.process(
+                            5,
+                            listOf(
+                                listOf(1.0, 0.0, 0.0, 0.0, 0.0),
+                                listOf(0.0, 0.0, 1.0, 0.0, 0.0),
+                                listOf(0.0, 0.0, 0.0, 1.0, 0.0),
+                                listOf(0.0, Math.cos(angle), 0.0, 0.0, -Math.sin(angle)),
+                            )
+                        ),
+                        4
                     )
-                },
-                {
-                    val angle = 3.1415926 / 12
-                    assert(
-                        listOf(
-                            listOf(0.0, 0.0, 0.0, 1.0, 0.0),
-                            listOf(0.0, 0.0, 0.0, -1.0, 0.0)
-                        ).roundContains(
-                            DMatrixRotation.process(
-                                5,
-                                listOf(
-                                    listOf(1.0, 0.0, 0.0, 0.0, 0.0),
-                                    listOf(0.0, Math.sin(angle), Math.cos(angle), 0.0, 0.0),
-                                    listOf(0.0, Math.cos(angle), -Math.sin(angle), 0.0, 0.0),
-                                    listOf(0.0, 0.0, 0.0, 0.0, 1.0),
-                                )
-                            ),
-                            4
-                        )
+                )
+            },
+            {
+                val angle = 3.1415926 / 12
+                assert(
+                    listOf(
+                        listOf(0.0, 0.0, 0.0, 1.0, 0.0),
+                        listOf(0.0, 0.0, 0.0, -1.0, 0.0)
+                    ).roundContains(
+                        DMatrixRotation.process(
+                            5,
+                            listOf(
+                                listOf(1.0, 0.0, 0.0, 0.0, 0.0),
+                                listOf(0.0, Math.sin(angle), Math.cos(angle), 0.0, 0.0),
+                                listOf(0.0, Math.cos(angle), -Math.sin(angle), 0.0, 0.0),
+                                listOf(0.0, 0.0, 0.0, 0.0, 1.0),
+                            )
+                        ),
+                        4
                     )
-                },
-                {
-                    assert(
-                        """
+                )
+            },
+            {
+                assert(
+                    """
                             -0.10055483532123037 -0.2792648657992645 -0.11937521604157313 -0.07023713233581212 0.1588367091749166 -0.19093231568255487 -0.17057811329942976 0.06522576853569718 -0.36815783700891125 0.26798707547945144 -0.29043394010993123 0.001950016583127323 0.6321865490984628 -0.10077718643569203 -0.18678831354298672 -0.24751147435605797
                         """.trimIndent().parseMatrix().run { this.plusElement(this[0].map { -it }) }
-                            .roundContains(
-                                DMatrixRotation.process(
-                                    16,
-                                    """
+                        .roundContains(
+                            DMatrixRotation.process(
+                                16,
+                                """
                                         -0.028392943185519007 0.3121058190441873 0.17547564383400804 -0.06190979569821279 0.06087706258577623 0.16331031836971469 -0.0658436462709455 0.18883085485556134 0.09479724498472943 -0.2013789094758504 -0.20928722377724673 -0.3773355148150074 0.4827856314492917 0.15657784443153921 0.17279899550868788 0.523076690375168
                                         -0.4429483590548033 -0.18460171428629274 0.4949556077318036 0.0216973830366921 0.21337992968629835 -0.0939256522894528 -0.08290685080879687 -0.3084893949906063 0.009540346843173092 0.3882314871859014 0.1555683891200062 -0.32299278481415405 -0.13440168098504676 -0.12474174703778373 0.2138654145102991 0.09576822817939043
                                         -0.05509546893268137 0.09873793394207389 0.3163137080449338 0.13817082383326268 -0.14880241236350744 -0.06265662142854754 -0.17929340506029498 -0.10231807961463281 0.45543130540622484 -0.13567973264278496 0.03771321164478823 -0.1618799722059494 0.18622748540012124 0.3615793245429401 -0.3671207724664406 -0.4957162749397309
@@ -166,29 +165,28 @@ internal class DMatrixRotationTest {
                                         0.39017846420149366 -0.08900155178253827 -0.06079640216968124 -0.1153138328946764 0.33682479149577566 -0.11778974409864236 -0.20238473320473013 0.006718781778510666 0.4957521262552656 0.13166050166711618 -0.2726804457168128 0.0678350893476752 -0.0036459096046477513 -0.059369634830757814 0.5189835500832365 -0.1989298026272808
                                         0.08707706859594631 -0.07387900998019799 0.12018839037235335 0.13910220259630596 -0.1128577264970971 -0.19004193128091995 -0.5943423589275422 -0.04476898212552565 -0.44338327199756 -0.25994727360438985 0.04549089406165327 0.10316969995027217 -0.13240186420685485 0.3945235844610607 0.31443501846128213 0.01190327947576829
                                 """.trimIndent().parseMatrix()
+                            ),
+                            6
+                        )
+                )
+            },
+            *(0..10).map {
+                {
+                    val n = Random.nextInt(2, 17)
+                    println("matrix ${n}x$n")
+                    val randomOrthogonalMatrix = generateOrthogonalMatrix(n, n.toDouble().pow(3).toInt()).shuffled()
+                    assert(
+                        listOf(randomOrthogonalMatrix.first()).run { this.plusElement(this[0].map { -it }) }
+                            .roundContains(
+                                DMatrixRotation.process(
+                                    n,
+                                    randomOrthogonalMatrix.subList(1, n)
                                 ),
                                 6
                             )
                     )
-                },
-                *(0..10).map {
-                    {
-                        val n = Random.nextInt(2, 17)
-                        println("matrix ${n}x$n")
-                        val randomOrthogonalMatrix = generateOrthogonalMatrix(n, n.toDouble().pow(3).toInt()).shuffled()
-                        assert(
-                            listOf(randomOrthogonalMatrix.first()).run { this.plusElement(this[0].map { -it }) }
-                                .roundContains(
-                                    DMatrixRotation.process(
-                                        n,
-                                        randomOrthogonalMatrix.subList(1, n)
-                                    ),
-                                    6
-                                )
-                        )
-                    }
-                }.toTypedArray()
-            )
+                }
+            }.toTypedArray()
         )
     }
 

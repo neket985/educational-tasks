@@ -25,7 +25,7 @@ object Utils {
     fun assertTimeLimitAndMemoryUsageLimit(
         timeout: Duration,
         maxProcessUsage: DataAmount,
-        processes: List<() -> Unit>
+        vararg processes: () -> Unit
     ) {
         val runtime = Runtime.getRuntime()
         val totalMemoryBeforeStart = runtime.totalMemory()
