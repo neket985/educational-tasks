@@ -28,13 +28,11 @@ object Utils {
         vararg processes: () -> Unit
     ) {
         val runtime = Runtime.getRuntime()
-        val totalMemoryBeforeStart = runtime.totalMemory()
-        logger.info { "Total memory usage before start ${formatBytes(totalMemoryBeforeStart)}" }
         processes.forEach { process ->
             Assertions.assertTimeoutPreemptively(timeout, ThrowingSupplier {
-                val startUsage = runtime.totalMemory() - runtime.freeMemory()
+                val beforeStartUsage = runtime.totalMemory() - runtime.freeMemory()
                 process.invoke()
-                val processUsage = totalMemoryBeforeStart + runtime.totalMemory() - runtime.freeMemory() - startUsage
+                val processUsage = runtime.totalMemory() - runtime.freeMemory() - beforeStartUsage
                 logger.info { "Process memory usage ${formatBytes(processUsage)}" }
                 assert(processUsage < maxProcessUsage.bytes) {
                     "Memory usage limit. used ${formatBytes(processUsage)}, max $maxProcessUsage"
@@ -47,5 +45,6 @@ object Utils {
         parse(it)
     }
 
+    @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
     fun filReaderFromClasspath(path: String) = BufferedReader(InputStreamReader(javaClass.classLoader.getResourceAsStream(path)))
 }

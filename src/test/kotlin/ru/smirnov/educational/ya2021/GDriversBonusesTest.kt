@@ -11,14 +11,14 @@ internal class GDriversBonusesTest {
     @Test
     fun process() {
         Utils.assertTimeLimitAndMemoryUsageLimit(
-            Duration.ofSeconds(100),
-            DataAmount.ofMega(6400),
+            Duration.ofSeconds(1),
+            DataAmount.ofMega(64),
 
-//            gDriversTestAssert(listOf(), 0),
-//            gDriversTestAssert(listOf(10), 500),
-//            gDriversTestAssert(listOf(1, 2, 3, 4), 5000),
-//            gDriversTestAssert(listOf(4, 3, 2, 1), 5000),
-//            gDriversTestAssert(listOf(5, 5, 5, 5), 2000),
+            gDriversTestAssert(listOf(), 0),
+            gDriversTestAssert(listOf(10), 500),
+            gDriversTestAssert(listOf(1, 2, 3, 4), 5000),
+            gDriversTestAssert(listOf(4, 3, 2, 1), 5000),
+            gDriversTestAssert(listOf(5, 5, 5, 5), 2000),
             gDriversTestAssert(listOf(4, 2, 3, 3), 3000),
             gDriversTestAssert(listOf(1, 2, 3, 3, 3, 3, 1), 5500),
             gDriversTestAssert(listOf(1, 2, 3, 3, 3, 3, 10), 5500),
