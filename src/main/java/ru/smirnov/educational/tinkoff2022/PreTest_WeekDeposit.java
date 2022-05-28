@@ -2,7 +2,7 @@ package ru.smirnov.educational.tinkoff2022;
 
 import java.util.Scanner;
 
-public class Main {
+public class PreTest_WeekDeposit {
 
   public static void main(String[] args) {
     while(true) {
