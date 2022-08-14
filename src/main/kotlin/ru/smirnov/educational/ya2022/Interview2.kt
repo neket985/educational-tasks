@@ -98,7 +98,7 @@ object Interview2 {
 
 
     fun findSubArray(vararg input: Int, x: Int): Pair<Int, Int> {
-        val sIMinusXMap = mutableMapOf<Int, Int>() //sum - x to idx
+        val sIMinusXMap = mutableMapOf<Int, MutableList<Int>>() //sum - x to list<idx>
 
         var sum = 0
         val partlySum = Array(input.size) { i ->
@@ -109,16 +109,19 @@ object Interview2 {
             if (sIMinusX == 0) {
                 return 0 to i
             }
-            sIMinusXMap.put(sIMinusX, i)
+            sIMinusXMap.compute(sIMinusX) { _, v ->
+                v?.apply { add(i) } ?: mutableListOf(i)
+            }
             sum
-        } //[1, 3, 7]
+        }
 
         for (j in input.indices) {
             val elementJ = partlySum[j]
 
-            val i = sIMinusXMap[elementJ]
-            if (i != null) {
-                return j+1 to i
+            sIMinusXMap[elementJ]?.forEach { i ->
+                if (j + 1 <= i) {
+                    return j + 1 to i
+                }
             }
         }
 
