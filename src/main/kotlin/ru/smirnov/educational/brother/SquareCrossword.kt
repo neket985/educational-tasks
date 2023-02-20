@@ -1,22 +1,15 @@
 package ru.smirnov.educational.brother
 
-import me.tongfei.progressbar.DelegatingProgressBarConsumer
-import me.tongfei.progressbar.ProgressBar
-import me.tongfei.progressbar.ProgressBarBuilder
-import me.tongfei.progressbar.ProgressBarStyle
-import java.math.BigInteger
-import java.util.*
+import me.tongfei.progressbar.*
+import ru.smirnov.educational.common.CustomConsoleProgressBarConsumer
+import java.time.Duration
 
 object SquareCrossword {
 
     fun buildCrossword(n: Int, words: List<String>): List<String> {
         return CrossMatrix(n, words).run {
             initCrossMatrix()
-            stepOnVariants().map {
-                words[it]
-            }.also {
-                println("result: \n${it.joinToString("\n")}")
-            }
+            stepOnVariants()
         }
 
     }
@@ -47,122 +40,104 @@ object SquareCrossword {
             crossMatrix[i].getIndexesWithMaxWeight().toList()
         }
 
-        fun stepOnVariants(): List<Int> {
+        fun stepOnVariants(): List<String> {
             val positionVariants = buildPositionVariants()
 
-            val variantsSequence = sequence {
-                val totalVariantsCount = positionVariants.fold(BigInteger.ONE){ acc, element ->
-                    acc * element.size.toBigInteger()
-                }
-                println("Total variants: $totalVariantsCount")
-                ProgressBarBuilder()
-                    .setStyle(ProgressBarStyle.ASCII)
-                    .setInitialMax(totalVariantsCount.toLong())
-                    .setTaskName("Variants task")
-                    .setConsumer(DelegatingProgressBarConsumer(::println))
-                    .build()
-                    .use { bar ->
-                        val indexes = VariantsIterationIndexes(positionVariants)
-                        val stateIndexes = indexes.state
-                        loop@ while (true) {
-                            val variants = mutableListOf<PositionVariant>()
-                            for (i in 0 until 2 * n) {
-                                val pos = positionVariants[i]
-                                val variant = PositionVariant(
-                                    pos[stateIndexes[i].i],
-                                    stateIndexes[i].direction
-                                )
-                                if (variants.contains(variant)) { //если такая позиция уже занята
-                                    bar.step()
-                                    indexes.next()
-                                    continue@loop
-                                }
-                                variants.add(i, variant)
-                            }
+            return checkVariantReq(positionVariants, 0, mapOf(), mapOf(), mapOf())!!.map { words[it] }
+        }
 
-                            bar.step()
-                            this.yield(variants)
-                            indexes.next()
+        fun checkVariantReq(
+            positionVariants: List<List<Int>>,
+            wordI: Int,
+            directionMap: Map<Int, Boolean>,
+            horizontalWordsPositions: Map<Int, Int>,
+            verticalWordsPositions: Map<Int, Int>,
+        ): List<Int>? {
+            val directions = directionMap[wordI]?.let(::listOf) ?: listOf(true, false)
+
+            return useProgressBar("task word $wordI", directions.size.toLong() * positionVariants[wordI].size) { bar ->
+                directionLoop@ for (direction in directions) {
+                    val wordsPositions = if (direction) horizontalWordsPositions else verticalWordsPositions
+                    val positions = positionVariants[wordI].filter { !wordsPositions.containsKey(it) }
+                    bar.stepBy(positionVariants[wordI].size - positions.size.toLong())
+                    positionLoop@ for (position in positions) {
+                        bar.step()
+                        val horizontalWordsPositionsCopy = horizontalWordsPositions.toMutableMap()
+                        val verticalWordsPositionsCopy = verticalWordsPositions.toMutableMap()
+                        val directionMapCopy = directionMap.toMutableMap()
+                        val sameDirectionWords = crossMatrix[wordI].row.mapIndexedNotNull { i, pos ->
+                            if (pos.contains(position) || i == wordI) null
+                            else i
+                        }
+                        for (sameDirectionWord in sameDirectionWords) {
+                            val existsDirection = directionMapCopy[sameDirectionWord]
+                            if (existsDirection != null && existsDirection != direction) {
+                                continue@positionLoop
+                            }
+                            directionMapCopy[sameDirectionWord] = direction
+                        }
+
+                        val wordsPositionsCopy =
+                            if (direction) horizontalWordsPositionsCopy else verticalWordsPositionsCopy
+                        wordsPositionsCopy.apply { put(position, wordI) }
+
+                        if (wordI == 2 * n - 1) {
+                            val resultList = horizontalWordsPositionsCopy.entries.sortedBy { it.key }.map { it.value }
+                            return@useProgressBar if (finalCheck(resultList)) resultList else null
+                        } else {
+                            checkVariantReq(
+                                positionVariants,
+                                wordI + 1,
+                                directionMapCopy.apply { put(wordI, direction) },
+                                horizontalWordsPositionsCopy,
+                                verticalWordsPositionsCopy
+                            )?.also {
+                                return@useProgressBar it
+                            }
                         }
                     }
-            }
-
-            return checkVariant(variantsSequence)
-        }
-
-        fun checkVariant(variantsSequence: Sequence<List<PositionVariant>>): List<Int> {
-            variantLoop@ for (variant in variantsSequence) {
-                val checkMarks = LinkedList((0 until 2 * n).toList())
-                val stack: Stack<Int> = Stack()
-                val validation = CrossMatrixValidation(crossMatrix)
-
-                while (checkMarks.isNotEmpty()) {
-                    stack.add(checkMarks.poll())
-                    while (stack.isNotEmpty()) {
-                        val wordI = stack.pop()
-                        val position = variant[wordI].pos
-                        val isHorizontalDirection = variant[wordI].direction
-                        val (result, sameDirectionWords) = validation.validate(wordI, position, isHorizontalDirection)
-
-                        if (!result) continue@variantLoop
-                        val notCheckedSameDirectionWords = sameDirectionWords.filter { checkMarks.remove(it) }
-                        stack.addAll(notCheckedSameDirectionWords)
-                    }
                 }
 
-                return validation.getResultMatrix()
+                return@useProgressBar null
             }
-
-            throw IllegalStateException("Correct variant is not found")
         }
-    }
 
-
-    class CrossMatrixValidation(
-        private val crossMatrix: Array<CrossMatrixRow>
-    ) {
-        private val directionMap = mutableMapOf<Int, Boolean>() //word to isHorizontal
-
-        //position to wordI
-        private val horizontalWordsPositions = mutableMapOf<Int, Int>()
-        private val verticalWordsPositions = mutableMapOf<Int, Int>()
-
-
-        fun validate(
-            wordI: Int,
-            position: Int,
-            isHorizontalDirection: Boolean
-        ): Pair<Boolean, List<Int>> { //validationResult to list words indexes at the same direction
-            directionMap[wordI]?.also {
-                if (it != isHorizontalDirection)
-                    return false to emptyList()
+        //todo где-то не хватает валидаций. из-за этого приходится дополнительно проверять корректность получившейся матрицы на финальном этапе
+        private fun finalCheck(result: List<Int>): Boolean {
+            val resultMatrix = result.map { words[it] }
+            val resultWords = parseWordsFromMatrix(resultMatrix.toMatrix())
+            val wordsDifference = words.toMutableList()
+            resultWords.forEach {
+                wordsDifference.remove(it)
             }
+            return wordsDifference.isEmpty()
+        }
 
-            val wordsPositions =
-                if (isHorizontalDirection) horizontalWordsPositions
-                else verticalWordsPositions
-
-            if (wordsPositions.containsKey(position))
-                return false to emptyList()
-
-            val sameDirectionWords = crossMatrix[wordI].row.mapIndexedNotNull { i, pos ->
-                if (pos.contains(position) || i == wordI) null
-                else i
+        private fun List<String>.toMatrix(): Array<CharArray> {
+            val n = size
+            return Array(n) { i ->
+                this[i].toCharArray()
             }
-            sameDirectionWords.forEach {
-                directionMap[it]?.also {
-                    if (it != isHorizontalDirection)
-                        return false to emptyList()
+        }
+
+        private fun parseWordsFromMatrix(matrix: Array<CharArray>): List<String> {
+            val n = matrix.size
+            val sb = StringBuilder()
+            return (0 until n).flatMap { i ->
+                (0 until n).forEach { j ->
+                    sb.append(matrix[i][j])
                 }
-                directionMap[it] = isHorizontalDirection
+                val hWord = sb.toString()
+                sb.clear()
+
+                (0 until n).forEach { j ->
+                    sb.append(matrix[j][i])
+                }
+                val vWord = sb.toString()
+                sb.clear()
+                listOf(hWord, vWord)
             }
-
-            wordsPositions[position] = wordI
-            return true to sameDirectionWords
         }
-
-        fun getResultMatrix() = horizontalWordsPositions.entries.sortedBy { it.key }
-            .map { it.value }
     }
 
     class CrossMatrixRow(val n: Int) {
@@ -187,51 +162,19 @@ object SquareCrossword {
         override fun toString() = row.joinToString(",")
     }
 
-    class VariantsIterationIndexes(positionVariants: List<List<Int>>) {
-        val size = positionVariants.size
-        val state = Array(positionVariants.size) { VariantIndex() }
-
-        private val sizes = positionVariants.map { it.size }
-
-        fun next(): Array<VariantIndex> {
-            (0 until size).reversed().forEach { i ->
-                if (state[i].isLast(sizes[i] - 1)) {
-                    state[i].reset()
-                } else {
-                    state[i].next()
-                    return state
-                }
+    private val consumersMap = mutableMapOf<String, InteractiveConsoleProgressBarConsumer>()
+    private fun <T> useProgressBar(name: String, maxNumbers: Long, exec: (ProgressBar) -> T): T {
+        val consumer = consumersMap.getOrPut(name) { CustomConsoleProgressBarConsumer(System.out) }
+        return ProgressBarBuilder()
+            .setStyle(ProgressBarStyle.ASCII)
+            .setTaskName(name)
+            .setInitialMax(maxNumbers)
+            .setConsumer(consumer)
+            .continuousUpdate()
+            .setUpdateIntervalMillis(Duration.ofSeconds(1).toMillis().toInt())
+            .build()
+            .use {
+                exec(it)
             }
-
-            throw IllegalStateException("iterator already ending")
-        }
     }
-
-    data class VariantIndex(
-        var i: Int,
-        var direction: Boolean
-    ) {
-        constructor() : this(0, false)
-
-        fun next() {
-            if (direction) {
-                ++i
-                direction = false
-            } else {
-                direction = true
-            }
-        }
-
-        fun isLast(lastI: Int) = i == lastI && direction
-
-        fun reset() {
-            i = 0
-            direction = false
-        }
-    }
-
-    data class PositionVariant(
-        val pos: Int,
-        val direction: Boolean
-    )
 }
